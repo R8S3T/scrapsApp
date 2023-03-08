@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+
+{% block title %}Page Title{% endblock %}
+
+{% block content %}
+  <!-- Page content goes here -->
+  <div class="container-fluid index-top">
+    <div class="row">
+      <div class="col-md-9 order-md-1">
+        <h1 class="main-heading d-none d-md-block">Reduce Waste and <br> Build Something New</h1>
+        <h1 class="main-heading d-md-none">Reduce Waste and <br> Build Something New</h1>
+        <img src="{{ url_for('static', filename='images/diy.jpg')}}" alt="Tools and scraps of wood on a wooden underground" class="img-start d-md-none">
+        <p class="main-text d-none d-md-block">
+          Welcome to Scraps, the marketplace for DIYers to share and trade their leftover materials from projects and workshops. Our platform connects you with like-minded individuals who value resourcefulness, creativity, and sustainability.
+        </p>
+        <p class="main-text d-md-none">
+          Welcome to Scraps, the marketplace for DIYers to share and trade their leftover materials from projects and workshops. Our platform connects you with like-minded individuals who value resourcefulness, creativity, and sustainability.
+        </p>
+      </div>
+      <div class="col-md-3 order-md-2">
+        <img src="{{ url_for('static', filename='images/diy.jpg')}}" alt="Tools and scraps of wood on a wooden underground" class="img-start d-none d-md-block">
+      </div>
+    </div>
+  </div>
+  
+{% endblock %}
