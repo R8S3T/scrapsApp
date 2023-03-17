@@ -42,6 +42,15 @@
     width: 60%;
 }
 
+/* GOOGLE  MAPS */
+
+#map {
+  height: 400px;
+  width: 100%;
+}
+
+/*MEDIA SCREEN*/
+
 /* Mobile Phone */
 @media screen and (orientation: portrait) {
     .index-top {

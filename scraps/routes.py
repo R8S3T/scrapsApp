@@ -31,3 +31,10 @@ def login():
         else:
             flash('Login Unsuccessful.', 'danger')
     return render_template('login.html', title='Login', form=form)
+
+@app.route('/map')
+def map():
+    return render_template('map.html')
+
+if __name__ == '__main__':
+    app.run(debug=True)

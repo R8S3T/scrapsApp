@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, HiddenField
 from wtforms.validators import DataRequired, Length, Email, EqualTo
 
 class RegistrationForm(FlaskForm):
@@ -19,3 +19,15 @@ class LoginForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
     remember = BooleanField('Remember Me')
     submit = SubmitField('Login')
+    
+
+class NewLocationForm(FlaskForm):
+    description = StringField('Location description',
+                           validators=[DataRequired(), Length(min=1, max=80)])
+    lookup_address = StringField('Search address')
+
+    coord_latitude = HiddenField('Latitude',validators=[DataRequired()])
+
+    coord_longitude = HiddenField('Longitude', validators=[DataRequired()])                    
+
+    submit = SubmitField('Create Location')
