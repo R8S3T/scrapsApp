@@ -1,3 +1,20 @@
+function loadGoogleMapsAPI() {
+    const apiKey = document.querySelector('meta[name="google-maps-api-key"]').content;
+  
+    if (!apiKey) {
+      console.error('Google Maps API key is missing!');
+      return;
+    }
+  
+    const script = document.createElement('script');
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&callback=initMap`;
+    script.async = true;
+    script.defer = true;
+  
+    document.body.appendChild(script);
+  }
+
+
 function initMap() {
   var mapOptions = {
       zoom: 10,
@@ -20,7 +37,7 @@ function initMap() {
   searchBox.addListener('places_changed', function() {
       var places = searchBox.getPlaces();
 
-      if (places.length === 0) {
+        if (places.length === 0) {
           return;
       }
 
@@ -54,12 +71,6 @@ function initMap() {
   // Attach initMap to the window object
   window.initMap = initMap;
 
-  function loadGoogleMapsAPI() {
-    var script = document.createElement('script');
-    script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyCd6qgYy2GvHr1zhkmQIcORpRU1ztngtWA&libraries=places&callback=initMap';
-    script.async = true;
-    document.head.appendChild(script);
-}
 
 // Call the loadGoogleMapsAPI function when the DOM is fully loaded
 document.addEventListener("DOMContentLoaded", function() {

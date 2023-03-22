@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <h1>Update Profile</h1>
+    <form method="POST" action="{{ url_for('profile') }}" enctype="multipart/form-data">
+    {{ form.hidden_tag() }}
+    <div class="form-group">
+        {{ form.username.label(class="form-control-label") }} 
+        {{ form.username(class="form-control") }}
+    </div>
+    <div class="form-group">
+        {{ form.email.label(class="form-control-label") }} 
+        {{ form.email(class="form-control") }}
+    </div>
+    <div class="form-group">
+        {{ form.profile_picture.label(class="form-control-label") }} 
+        {{ form.profile_picture(class="form-control-file") }}
+    </div>
+    <div class="form-group">
+        {{ form.items_for_trade.label(class="form-control-label") }}
+        {{ form.items_for_trade(class="form-control") }}
+    </div>
+    <div class="form-group">
+        {{ form.items_wanted.label(class="form-control-label") }}
+        {{ form.items_wanted(class="form-control") }}
+    </div>
+    <div>
+        {{ form.submit(class="btn btn-primary") }}
+    </div>
+  </form>
+{% endblock %}

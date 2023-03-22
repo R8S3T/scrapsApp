@@ -2,10 +2,12 @@
 
 {% block title %}Page Title{% endblock %}
 
+
 {% block content %}
   <!-- Page content goes here -->
   <input id="search-input" type="text" placeholder="Search address" style="width: 300px;">
   <div id="map" style="width: 100%; height: 400px;"></div>
   
   <script src="{{ url_for('static', filename='map.js') }}" defer></script>
+
 {% endblock %}

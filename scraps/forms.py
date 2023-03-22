@@ -1,10 +1,11 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, HiddenField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, HiddenField, TextAreaField
 from wtforms.validators import DataRequired, Length, Email, EqualTo
+from flask_wtf.file import FileField, FileAllowed
 
 class RegistrationForm(FlaskForm):
     username = StringField('Username',
-                           validators=[DataRequired(), Length(min=2, max=20)])
+                           validators=[DataRequired(), Length(min=2, max=80)])
     email = StringField('Email',
                         validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
@@ -21,13 +22,10 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Login')
     
 
-class NewLocationForm(FlaskForm):
-    description = StringField('Location description',
-                           validators=[DataRequired(), Length(min=1, max=80)])
-    lookup_address = StringField('Search address')
-
-    coord_latitude = HiddenField('Latitude',validators=[DataRequired()])
-
-    coord_longitude = HiddenField('Longitude', validators=[DataRequired()])                    
-
-    submit = SubmitField('Create Location')
+class ProfileForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired(), Length(min=2, max=80)])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    profile_picture = FileField('Profile Picture', validators=[FileAllowed(['jpg', 'jpeg', 'png'])])
+    items_for_trade = TextAreaField('Items for Trade', validators=[DataRequired()])
+    items_wanted = TextAreaField('Items Wanted', validators=[DataRequired()])
+    submit = SubmitField('Update')

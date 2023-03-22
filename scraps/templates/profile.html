@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container">
+  <h1>My Profile</h1>
+  <img src="{{ profile_picture }}" alt="Profile Picture" class="profile-picture">
+  <h2>{{ current_user.username }}</h2>
+  <p>{{ current_user.email }}</p>
+
+  {% if items_for_trade %}
+  <h3>My Items for Trade</h3>
+  <ul>
+      {% for item in items_for_trade %}
+      <li>{{ item }}</li>
+      {% endfor %}
+  </ul>
+  {% endif %}
+
+  {% if items_wanted %}
+  <h3>My Items Wanted</h3>
+  <ul>
+      {% for item in items_wanted %}
+      <li>{{ item }}</li>
+      {% endfor %}
+  </ul>
+  {% endif %}
+
+  <a href="{{ url_for('logout') }}">Log Out</a>
+  <a href="{{ url_for('update_profile') }}">Update Profile</a>
+</div>
+{% endblock %}

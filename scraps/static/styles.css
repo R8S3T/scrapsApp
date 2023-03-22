@@ -1,13 +1,25 @@
 /* Layout */
 
 /* Navbar */
-#navbarNav  {
+/* #navbarNav  {
     font-size: 1.2em;
     padding: 15px;
     margin-left: 50%;
     float: right;
+} */
+
+.brand-spacing {
+  padding-left: 8rem;
 }
 
+.navbar-nav {
+  margin-right: 2rem;
+  font-size: 1.5em;
+}
+
+.first-nav-item {
+  margin-left: 41rem;
+}
 .text {
     padding: 0.5em 0.2em 0.5em 0.2em;
 }
@@ -16,6 +28,66 @@
     padding-bottom: 0.2em;
 }
 
+/* Content Padding */
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+header {
+  flex-shrink: 0;
+}
+
+footer {
+  flex-shrink: 0;
+  margin-top: auto;
+}
+
+main {
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+  flex-grow: 1;
+}
+
+  /* General */
+  .content-section {
+    padding: 2rem;
+    background-color: #f8f9fa;
+    border-radius: 5px;
+    margin-bottom: 2rem;
+  }
+  
+  h1 {
+    margin-bottom: 1rem;
+  }
+  
+  /* Profile */
+  .profile-picture {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-bottom: 1rem;
+  }
+  
+  /* Forms */
+  .form-control-label {
+    font-weight: bold;
+  }
+  
+  .form-group {
+    margin-bottom: 1rem;
+  }
+  
+  .invalid-feedback {
+    color: red;
+  }
+  
+  .btn-outline-info {
+    margin-top: 1rem;
+  }
+  
 /* Index */
 .container-fluid, .index-top{
     display: grid;
@@ -34,12 +106,17 @@
 
 /* Register */
 .register-background {
-    background-color: #5585b5;
+    background-color: #c4c1e0;
     width: 20%;
 }
 
-.register-form {
+.register-form, .login-form {
     width: 60%;
+}
+
+/* Login */
+.login-background {
+  background-color: #a7bcb9;
 }
 
 /* GOOGLE  MAPS */
@@ -127,4 +204,5 @@
       display: block;
     }
   }
-  
+
+
