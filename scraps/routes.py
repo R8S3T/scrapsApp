@@ -4,7 +4,7 @@ import secrets
 from PIL import Image
 import json
 from flask import Flask
-from flask import render_template, url_for, flash, redirect, request, current_app
+from flask import render_template, url_for, flash, redirect, request, current_app, jsonify
 from scraps import app, db, bcrypt
 from scraps.forms import RegistrationForm, LoginForm, ProfileForm
 from scraps.models import User, Item
@@ -12,7 +12,7 @@ from flask_login import login_user, current_user, logout_user, login_required
 from json import JSONDecodeError
 
 
-
+# HOME PAGE
 
 @app.route('/')
 @app.route('/index')
@@ -36,6 +36,9 @@ def register():
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
 
+
+# LOGIN PAGE
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
@@ -51,33 +54,37 @@ def login():
 print("Update Login")
 
 
-''' Create save_picutre function to save an uploaded 
-    image file to server's filesytem'''
+# SAVE PICTURE FUNCTION
+
 def save_picture(form_picture, picture_path):
     random_hex = secrets.token_hex(8)
     _, f_ext = os.path.splitext(form_picture.filename)
     picture_fn = random_hex + f_ext
     picture_path = os.path.join(picture_path, picture_fn)
-    
-    # resize image to max size of 125 x 125
+
     output_size = (125, 125)
     img = Image.open(form_picture)
     img.thumbnail(output_size)
 
     img.save(picture_path)
-    
+
     # return the filename so that it can be stored in the database
     return picture_fn
+
+
+# PROFILE PAGE
 
 @app.route("/profile")
 @login_required
 def profile():
     form = ProfileForm()
     profile_picture = url_for('static', filename='profile_pics/' + current_user.profile_picture) if current_user.profile_picture else None
-    items_for_trade = json.loads(current_user.items_for_trade) if current_user.items_for_trade else []
-    items_wanted = json.loads(current_user.items_wanted) if current_user.items_wanted else []
+    items_for_trade = safe_json_loads(current_user.items_for_trade) if current_user.items_for_trade else []
+    items_wanted = safe_json_loads(current_user.items_wanted) if current_user.items_wanted else []
     return render_template('profile.html', title='Profile', profile_picture=profile_picture,form=form, items_wanted=items_wanted, items_for_trade=items_for_trade)
 
+
+# UPDATE PROFILE
 
 @app.route("/update_profile", methods=['GET', 'POST'])
 @login_required
@@ -113,11 +120,48 @@ def update_profile():
     elif request.method == 'GET':
         form.username.data = current_user.username
         form.email.data = current_user.email
-        form.items_for_trade.data = current_user.items_for_trade
-        form.items_wanted.data = current_user.items_wanted
+        form.items_for_trade.data = safe_json_loads(current_user.items_for_trade)
+        form.items_wanted.data = safe_json_loads(current_user.items_wanted)
 
     return render_template('update_profile.html', title='Update Profile', form=form)
 
+
+# GET USER DATA
+# Returns JSON object containing all user data
+
+def safe_json_loads(s):
+    try:
+        return json.loads(s)
+    except json.JSONDecodeError:
+        return []
+
+@app.route('/api/users')
+def get_users():
+    users = User.query.all()
+    user_list = []
+    for user in users:
+        user_data =({
+            'id': user.id,
+            'username': user.username,
+            'street': user.street,
+            'postcode': user.postcode,
+            'city': user.city,
+            'country': user.country,
+            'items_wanted': safe_json_loads(user.items_wanted) if user.items_wanted and user.items_wanted.strip() else [],
+            'items_for_trade': safe_json_loads(user.items_for_trade) if user.items_for_trade and user.items_for_trade.strip() else [],
+            'lat': user.lat,
+            'lng': user.lng
+        })
+
+        # append dict to user_list array for each user
+        user_list.append(user_data)
+
+    # after loop finishes jsonify converts user_list array
+    # into JSON object, which is returned as response for API
+    return jsonify(user_list)
+
+
+# ABOUT PAGE
 
 @app.route('/about')
 def about():

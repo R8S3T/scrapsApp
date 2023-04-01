@@ -21,6 +21,8 @@ class User(db.Model, UserMixin):
     postcode = db.Column(db.String(20))
     city = db.Column(db.String(120))
     country = db.Column(db.String(120))
+    lat = db.Column(db.Float, nullable=True)
+    lng = db.Column(db.Float, nullable=True)
 
     def __repr__(self):
         return f"User('{self.username}', '{self.email}')"
