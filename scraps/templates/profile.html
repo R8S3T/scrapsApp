@@ -2,30 +2,50 @@
 
 {% block content %}
 <div class="container">
-  <h1>My Profile</h1>
-  <img src="{{ profile_picture }}" alt="Profile Picture" class="profile-picture">
-  <h2>{{ current_user.username }}</h2>
-  <p>{{ current_user.email }}</p>
-
-  {% if items_for_trade %}
-  <h3>My Items for Trade</h3>
-  <ul>
-      {% for item in items_for_trade %}
-      <li>{{ item }}</li>
-      {% endfor %}
-  </ul>
-  {% endif %}
-
-  {% if items_wanted %}
-  <h3>My Items Wanted</h3>
-  <ul>
-      {% for item in items_wanted %}
-      <li>{{ item }}</li>
-      {% endfor %}
-  </ul>
-  {% endif %}
-
-  <a href="{{ url_for('logout') }}">Log Out</a>
-  <a href="{{ url_for('update_profile') }}">Update Profile</a>
+  <h1 class="page-title">{{ title }}</h1>
+  <div class="form-container">
+    <img src="{{ profile_picture }}" alt="Profile Picture" class="profile-picture">
+    <h2>{{ current_user.username }}</h2>
+    <p>{{ current_user.email }}</p>
+    <div class="bottom-right-buttons">
+      <a class="btn btn-primary" href="{{ url_for('logout') }}">Log Out</a>
+      <a class="btn btn-primary" href="{{ url_for('update_profile') }}">Update Profile</a>
+    </div>
+    <div class="item-section">
+      <div class="item-container">
+        <h3>Items Wanted</h3>
+        <div class="items-for-trade">
+          <ul>
+            {% for item in items_wanted %}
+              <li>{{ item }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+      <div class="item-container">
+        <h3>Items for Trade</h3>
+        <div class="items-wanted">
+          <ul>
+            {% for item in items_for_trade %}
+              <li>{{ item }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}
+{% block scripts %}
+<script>
+  populateItems();
+</script>
+<script id="items-data" type="application/json">
+  {
+    "itemsForTrade": {{ items_for_trade|replace("\"", "\\\"")|safe }},
+    "itemsWanted": {{ items_wanted|replace("\"", "\\\"")|safe }}
+  }
+</script>
+<script src="{{ url_for('static', filename='dragdrop.js') }}"></script>
+{% endblock %}
+

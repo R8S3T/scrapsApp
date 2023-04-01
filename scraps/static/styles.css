@@ -126,6 +126,145 @@ main {
   width: 100%;
 }
 
+/* Profile */
+
+.bottom-right-buttons {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 2rem;
+}
+
+.bottom-right-buttons .btn {
+  margin-left: 1rem;
+}
+
+.item-section {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 2rem;
+}
+
+.item-container {
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  width: 45%;
+}
+
+.item-container h3 {
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+/*  Profile and Update Profile*/
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.form-container {
+  background-color: #f7f7f7;
+  border-radius: 4px;
+  padding: 2rem;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.form-control {
+  display: block;
+  width: 100%;
+  padding: 0.5rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+  margin-bottom: 1rem;
+}
+
+.btn {
+  display: inline-block;
+  font-weight: 400;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+  border: 1px solid transparent;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  border-radius: 0.25rem;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.btn-primary {
+  color: #fff;
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.btn-primary:hover {
+  color: #fff;
+  background-color: #0069d9;
+  border-color: #0062cc;
+}
+
+/* DRAG N DROP */
+
+.wrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 10px;
+  background: #fff;
+  color: #444;
+}
+
+.box {
+  background-color: #444;
+  color: #fff;
+  border-radius: 5px;
+  padding: 20px;
+  font-size: 150%;
+  height: 30vh;
+}
+
+.items-for-trade {
+  background-color: green;
+  color: #fff;
+  border-radius: 5px;
+  padding: 20px;
+  font-size: 150%;
+  height: 30vh;
+}
+
+.items-wanted {
+  background-color: green;
+  color: #fff;
+  border-radius: 5px;
+  padding: 20px;
+  font-size: 150%;
+  height: 30vh;
+}
+
+.task {
+  background-color: pink;
+  color: black;
+  padding: 5px;
+  margin: 4px;
+}
+
 /*MEDIA SCREEN*/
 
 /* Mobile Phone */
@@ -204,5 +343,6 @@ main {
       display: block;
     }
   }
+
 
 

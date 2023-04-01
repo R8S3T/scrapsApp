@@ -2,12 +2,14 @@ import os
 from dotenv import load_dotenv
 import secrets
 from PIL import Image
+import json
 from flask import Flask
 from flask import render_template, url_for, flash, redirect, request, current_app
 from scraps import app, db, bcrypt
 from scraps.forms import RegistrationForm, LoginForm, ProfileForm
 from scraps.models import User, Item
 from flask_login import login_user, current_user, logout_user, login_required
+from json import JSONDecodeError
 
 
 
@@ -46,15 +48,16 @@ def login():
         else:
             flash('Login Unsuccessful. Please check email and password', 'danger')
     return render_template('login.html', title='Login', form=form)
+print("Update Login")
 
 
 ''' Create save_picutre function to save an uploaded 
     image file to server's filesytem'''
-def save_picture(form_picture):
+def save_picture(form_picture, picture_path):
     random_hex = secrets.token_hex(8)
     _, f_ext = os.path.splitext(form_picture.filename)
     picture_fn = random_hex + f_ext
-    picture_path = os.path.join(current_app.root_path, 'static/profile_pics', picture_fn)
+    picture_path = os.path.join(picture_path, picture_fn)
     
     # resize image to max size of 125 x 125
     output_size = (125, 125)
@@ -62,24 +65,18 @@ def save_picture(form_picture):
     img.thumbnail(output_size)
 
     img.save(picture_path)
+    
+    # return the filename so that it can be stored in the database
     return picture_fn
 
 @app.route("/profile")
 @login_required
 def profile():
-    if current_user.items_for_trade:
-        items_for_trade = current_user.items_for_trade.split('\n')
-    else:
-        items_for_trade = None
-    
-    if current_user.items_wanted:
-        items_wanted = current_user.items_wanted.split('\n')
-    else:
-        items_wanted = None
-    
-    profile_picture = url_for('static', filename='profile_pics/' + current_user.profile_picture) if current_user.profile_picture else None
     form = ProfileForm()
-    return render_template('profile.html', title='Profile', profile_picture=profile_picture, items_for_trade=items_for_trade, items_wanted=items_wanted, form=form)
+    profile_picture = url_for('static', filename='profile_pics/' + current_user.profile_picture) if current_user.profile_picture else None
+    items_for_trade = json.loads(current_user.items_for_trade) if current_user.items_for_trade else []
+    items_wanted = json.loads(current_user.items_wanted) if current_user.items_wanted else []
+    return render_template('profile.html', title='Profile', profile_picture=profile_picture,form=form, items_wanted=items_wanted, items_for_trade=items_for_trade)
 
 
 @app.route("/update_profile", methods=['GET', 'POST'])
@@ -89,10 +86,26 @@ def update_profile():
     if form.validate_on_submit():
         current_user.username = form.username.data
         current_user.email = form.email.data
-        current_user.items_for_trade = form.items_for_trade.data
-        current_user.items_wanted = form.items_wanted.data
+        current_user.street = form.street.data
+        current_user.postcode = form.postcode.data
+        current_user.city = form.city.data
+        current_user.country = form.country.data
+
+        try:
+            items_wanted_data = json.loads(form.items_wanted_hidden.data) if form.items_wanted_hidden.data else []
+            items_for_trade_data = json.loads(form.items_for_trade_hidden.data) if form.items_for_trade_hidden.data else []
+
+            items_wanted_data = [item.strip() for item in items_wanted_data]
+            items_for_trade_data = [item.strip() for item in items_for_trade_data]
+
+            current_user.items_wanted = json.dumps(items_wanted_data)
+            current_user.items_for_trade = json.dumps(items_for_trade_data)
+        except JSONDecodeError:
+            flash("There was an error processing your items. Please try again.", "danger")
+            return redirect(url_for("update_profile"))
+
         if form.profile_picture.data:
-            picture_file = save_picture(form.profile_picture.data)
+            picture_file = save_picture(form.profile_picture.data, current_app.config['PROFILE_PICS_FOLDER'])
             current_user.profile_picture = picture_file
         db.session.commit()
         flash('Your account has been updated!', 'success')
@@ -102,7 +115,9 @@ def update_profile():
         form.email.data = current_user.email
         form.items_for_trade.data = current_user.items_for_trade
         form.items_wanted.data = current_user.items_wanted
+
     return render_template('update_profile.html', title='Update Profile', form=form)
+
 
 @app.route('/about')
 def about():

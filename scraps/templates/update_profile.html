@@ -1,31 +1,77 @@
 {% extends "layout.html" %}
 
 {% block content %}
-    <h1>Update Profile</h1>
-    <form method="POST" action="{{ url_for('profile') }}" enctype="multipart/form-data">
-    {{ form.hidden_tag() }}
-    <div class="form-group">
-        {{ form.username.label(class="form-control-label") }} 
-        {{ form.username(class="form-control") }}
+    <div class="container">
+        <h1 class="page-title">{{ title }}</h1>
+        <div class="form-container">
+            <form id="update-profile-form" method="POST" action="{{ url_for('update_profile') }}" enctype="multipart/form-data">
+                {{ form.hidden_tag() }}
+                <div class="form-group">
+                    {{ form.username.label(class="form-control-label") }}
+                    {{ form.username(class="form-control") }}
+                </div>
+                <div class="form-group">
+                    {{ form.street.label(class="form-control-label") }}
+                    {{ form.street(class="form-control") }}
+                </div>
+                <div class="form-group">
+                    {{ form.postcode.label(class="form-control-label") }}
+                    {{ form.postcode(class="form-control") }}
+                </div>
+                <div class="form-group">
+                    {{ form.city.label(class="form-control-label") }}
+                    {{ form.city(class="form-control") }}
+                </div>
+                <div class="form-group">
+                    {{ form.country.label(class="form-control-label") }}
+                    {{ form.country(class="form-control") }}
+                </div>
+                <div class="form-group">
+                    {{ form.email.label(class="form-control-label") }}
+                    {{ form.email(class="form-control") }}
+                </div>
+                <div class="form-group">
+                    {{ form.profile_picture.label(class="form-control-label") }}
+                    {{ form.profile_picture(class="form-control-file") }}
+                </div>
+                <div class="wrapper">
+                    <div class="box">
+                        <div id="scrap1" class="scrap" draggable="true">
+                            Wood
+                        </div>
+                        <div id="scrap2" class="scrap" draggable="true">
+                            Glass
+                        </div>
+                        <div id="scrap3" class="scrap" draggable="true">
+                            Metal
+                        </div>
+                        <div id="scrap4" class="scrap" draggable="true">
+                            Cotton Fabric
+                        </div>
+                        <div id="scrap5" class="scrap" draggable="true">
+                            Plastics
+                        </div>
+                </div>
+                    <div class="items-wanted drop-area"></div>
+                    <div class="items-for-trade drop-area"></div>
+                </div>
+                <div>
+                <button type="button" class="btn btn-primary" onclick="submitForm()">Update</button>
+                </div>
+                <input type="hidden" name="items_wanted_hidden" id="items_wanted_hidden" value="{{ form.items_wanted_hidden.data }}">
+                <input type="hidden" name="items_for_trade_hidden" id="items_for_trade_hidden" value="{{ form.items_for_trade_hidden.data }}">
+                </div>
+                </form>
+        </div>
     </div>
-    <div class="form-group">
-        {{ form.email.label(class="form-control-label") }} 
-        {{ form.email(class="form-control") }}
-    </div>
-    <div class="form-group">
-        {{ form.profile_picture.label(class="form-control-label") }} 
-        {{ form.profile_picture(class="form-control-file") }}
-    </div>
-    <div class="form-group">
-        {{ form.items_for_trade.label(class="form-control-label") }}
-        {{ form.items_for_trade(class="form-control") }}
-    </div>
-    <div class="form-group">
-        {{ form.items_wanted.label(class="form-control-label") }}
-        {{ form.items_wanted(class="form-control") }}
-    </div>
-    <div>
-        {{ form.submit(class="btn btn-primary") }}
-    </div>
-  </form>
+
 {% endblock %}
+{% block scripts %}
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelector('#update-profile-form').addEventListener('submit', updateHiddenInputs);
+    });
+    </script>
+{% endblock %}
+
+

@@ -17,6 +17,10 @@ class User(db.Model, UserMixin):
     profile_picture = db.Column(db.String(100))
     items_for_trade = db.Column(db.String(200))
     items_wanted = db.Column(db.String(120))
+    street = db.Column(db.String(120))
+    postcode = db.Column(db.String(20))
+    city = db.Column(db.String(120))
+    country = db.Column(db.String(120))
 
     def __repr__(self):
         return f"User('{self.username}', '{self.email}')"
