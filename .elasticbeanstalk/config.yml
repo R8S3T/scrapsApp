@@ -1,0 +1,5 @@
+branch-defaults:
+  main:
+    environment: ScrapsProject-env
+global:
+  profile: eb-cli
