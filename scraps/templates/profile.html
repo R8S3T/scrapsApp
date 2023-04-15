@@ -4,48 +4,55 @@
 <div class="container">
   <h1 class="page-title">{{ title }}</h1>
   <div class="form-container">
-    <img src="{{ profile_picture }}" alt="Profile Picture" class="profile-picture">
-    <h2>{{ current_user.username }}</h2>
-    <p>{{ current_user.email }}</p>
-    <div class="bottom-right-buttons">
-      <a class="btn btn-primary" href="{{ url_for('logout') }}">Log Out</a>
-      <a class="btn btn-primary" href="{{ url_for('update_profile') }}">Update Profile</a>
+    <div class="user-section">
+      <div class="user-section-left">
+        {% if profile_picture %}
+          <img src="{{ profile_picture }}" alt="Profile Picture" class="profile-picture">
+        {% endif %}
+        <h2>{{ current_user.username }}</h2>
+        <p>{{ current_user.email }}</p>
+        {% if current_user.address %}
+          <p>{{ current_user.address }}</p>
+        {% endif %}
+      </div>
+      <div class="user-section-right">
+        {% if current_user.about_me %}
+          <p>{{ current_user.about_me }}</p>
+        {% endif %}
+      </div>
     </div>
     <div class="item-section">
+      <input type="hidden" id="items-data" value="{{ all_items|tojson }}">
       <div class="item-container">
         <h3>Items Wanted</h3>
-        <div class="items-for-trade">
-          <ul>
-            {% for item in items_wanted %}
-              <li>{{ item }}</li>
-            {% endfor %}
-          </ul>
+        <div class="items-wanted" id="items-wanted">
+          {% for item in items_wanted %}
+            <div class="scrap">{{ item }}</div>
+          {% endfor %}
         </div>
       </div>
       <div class="item-container">
         <h3>Items for Trade</h3>
-        <div class="items-wanted">
-          <ul>
-            {% for item in items_for_trade %}
-              <li>{{ item }}</li>
-            {% endfor %}
-          </ul>
+        <div class="items-for-trade" id="items-for-trade">
+          {% for item in items_for_trade %}
+            <div class="scrap">{{ item }}</div>
+          {% endfor %}
         </div>
       </div>
+      <input type="hidden" name="items_wanted_hidden" id="items_wanted_hidden" value="{{ items_wanted|join(',') }}">
+      <input type="hidden" name="items_for_trade_hidden" id="items_for_trade_hidden" value="{{ items_for_trade|join(',') }}">
+    </div>
+    <div class="bottom-right-buttons">
+      <a class="btn btn-primary" href="{{ url_for('update_profile') }}">Update Profile</a>
     </div>
   </div>
 </div>
 {% endblock %}
 {% block scripts %}
 <script>
-  populateItems();
-</script>
-<script id="items-data" type="application/json">
-  {
-    "itemsForTrade": {{ items_for_trade|replace("\"", "\\\"")|safe }},
-    "itemsWanted": {{ items_wanted|replace("\"", "\\\"")|safe }}
+  if (document.getElementById('items-data')) {
+      populateItems();
   }
 </script>
-<script src="{{ url_for('static', filename='dragdrop.js') }}"></script>
 {% endblock %}
 

@@ -1,0 +1,58 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container">
+  <h1 class="page-title">{{ title }}</h1>
+  <div class="form-container">
+    <div class="user-section">
+      <div class="user-section-left">
+        {% if profile_picture %}
+          <img src="{{ profile_picture }}" alt="Profile Picture" class="profile-picture">
+        {% endif %}
+        <h2>{{ user.username }}</h2>
+        <p>{{ user.email }}</p>
+      </div>
+      <div class="user-section-right">
+        {% if user.about_me %}
+          <p>{{ user.about_me }}</p>
+        {% endif %}
+      </div>
+    </div>
+    <div class="item-section">
+      <div class="item-container">
+        <h3>Items Wanted</h3>
+        <div class="items-for-trade">
+          <ul>
+            {% for item in items_wanted %}
+              <li>{{ item }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+      <div class="item-container">
+        <h3>Items for Trade</h3>
+        <div class="items-wanted">
+          <ul>
+            {% for item in items_for_trade %}
+              <li>{{ item }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+  populateItems();
+</script>
+<script id="items-data" type="application/json">
+  {
+    "itemsForTrade": {{ items_for_trade|replace("\"", "\\\"")|safe }},
+    "itemsWanted": {{ items_wanted|replace("\"", "\\\"")|safe }}
+  }
+</script>
+<script src="{{ url_for('static', filename='dragdrop.js') }}"></script>
+{% endblock %}

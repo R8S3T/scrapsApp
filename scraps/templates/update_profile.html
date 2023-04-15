@@ -31,47 +31,58 @@
                     {{ form.email(class="form-control") }}
                 </div>
                 <div class="form-group">
+                    {{ form.about_me.label(class="form-control-label") }}
+                    {{ form.about_me(class="form-control") }}
+                </div>
+                <div class="form-group">
                     {{ form.profile_picture.label(class="form-control-label") }}
                     {{ form.profile_picture(class="form-control-file") }}
                 </div>
+                <div class="form-group">
+                    {{ scrap_form.scrap_picture.label(class="form-control-label") }}
+                    {{ scrap_form.scrap_picture(class="form-control-file") }}
+                </div>
+                <div class="form-group">
+                    {{ scrap_form.scrap_description.label(class="form-control-label") }}
+                    {{ scrap_form.scrap_description(class="form-control") }}
+                </div>
                 <div class="wrapper">
-                    <div class="box">
-                        <div id="scrap1" class="scrap" draggable="true">
-                            Wood
-                        </div>
-                        <div id="scrap2" class="scrap" draggable="true">
-                            Glass
-                        </div>
-                        <div id="scrap3" class="scrap" draggable="true">
-                            Metal
-                        </div>
-                        <div id="scrap4" class="scrap" draggable="true">
-                            Cotton Fabric
-                        </div>
-                        <div id="scrap5" class="scrap" draggable="true">
-                            Plastics
-                        </div>
+                    <div class="box drop-area">
+                        {% for item in items_data %}
+                            <div id="scrap{{ loop.index }}" class="scrap" draggable="true">
+                                {{ item }}
+                            </div>
+                        {% endfor %}
+                    </div>
                 </div>
-                    <div class="items-wanted drop-area"></div>
-                    <div class="items-for-trade drop-area"></div>
+                <div class="description-field" >Simply pick an item from the left box<br> and drop in one of the boxes below</div>
+                <div class="items-wanted drop-area" id="items-wanted">
+                    <h3>Items Wanted</h3>
                 </div>
-                <div>
-                <button type="button" class="btn btn-primary" onclick="submitForm()">Update</button>
+                <div class="items-for-trade drop-area" id="items-for-trade">
+                    <h3>Items For Trade</h3>
                 </div>
+                <input type="submit" class="btn btn-primary" value="Update" onclick="event.preventDefault(); submitForm();">
+                <input type="button" class="btn btn-secondary" value="Cancel" onclick="window.location.href='{{ url_for('profile') }}'">
                 <input type="hidden" name="items_wanted_hidden" id="items_wanted_hidden" value="{{ form.items_wanted_hidden.data }}">
                 <input type="hidden" name="items_for_trade_hidden" id="items_for_trade_hidden" value="{{ form.items_for_trade_hidden.data }}">
+                <input type="hidden" name="items_data" id="items_data" value="{{ items_data|tojson|safe }}">
                 </div>
-                </form>
+            </form>
         </div>
     </div>
-
 {% endblock %}
 {% block scripts %}
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        document.querySelector('#update-profile-form').addEventListener('submit', updateHiddenInputs);
-    });
+        var allItems = {{ items_data|tojson }};
     </script>
-{% endblock %}
-
-
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            populateItems();
+            document.querySelector('#update-profile-form').addEventListener('submit', function(event) {
+                event.preventDefault();
+                submitForm();
+            });
+        });
+    </script>
+{% endblock %} 

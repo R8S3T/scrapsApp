@@ -13,6 +13,8 @@ mysql_password = os.getenv('MYSQL_PASSWORD')
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '5791628bb0b13ce0c676dfde280ba245'
 app.config.from_pyfile('config.py')
+print("Profile pics folder:", app.config['PROFILE_PICS_FOLDER'])
+print("Scrap pics folder:", app.config['SCRAP_PICS_FOLDER'])
 
 
 # Initialize LoginManager

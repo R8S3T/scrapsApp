@@ -31,14 +31,20 @@ class LoginForm(FlaskForm):
 
 class ProfileForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(min=2, max=80)])
-    street = StringField('Street', validators=[DataRequired(), Length(max=100)])
-    postcode = StringField('Postcode', validators=[DataRequired(), Length(max=5)])
-    city = StringField('City', validators=[DataRequired(), Length(max=50)])
-    country = StringField('Country', validators=[DataRequired(), Length(max=50)])
+    street = StringField('Street', validators=[Length(max=100)])
+    postcode = StringField('Postcode', validators=[Length(max=5)])
+    city = StringField('City', validators=[Length(max=50)])
+    country = StringField('Country', validators=[Length(max=50)])
     email = StringField('Email', validators=[DataRequired(), Email()])
     profile_picture = FileField('Profile Picture', validators=[FileAllowed(['jpg', 'jpeg', 'png'])])
+    about_me = TextAreaField('About Me', validators=[Length(min=0, max=500)])
+    items_for_trade_hidden = HiddenField(default=[])
+    items_wanted_hidden = HiddenField(default=[])
+    submit = SubmitField('Update')
+
+class ScrapForm(FlaskForm):
     items_for_trade = TextAreaField('Items for Trade')
     items_wanted = TextAreaField('Items Wanted')
-    items_for_trade_hidden = HiddenField()
-    items_wanted_hidden = HiddenField()
-    submit = SubmitField('Update')
+    scrap_picture = FileField('Scrap Picture', validators=[FileAllowed(['jpg', 'jpeg', 'png'])])
+    scrap_description = TextAreaField('Scrap Description', validators=[Length(min=0, max=100)])
+    submit = SubmitField('Add Scrap')
