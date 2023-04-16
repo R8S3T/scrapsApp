@@ -38,51 +38,93 @@
                     {{ form.profile_picture.label(class="form-control-label") }}
                     {{ form.profile_picture(class="form-control-file") }}
                 </div>
-                <div class="form-group">
-                    {{ scrap_form.scrap_picture.label(class="form-control-label") }}
-                    {{ scrap_form.scrap_picture(class="form-control-file") }}
-                </div>
-                <div class="form-group">
-                    {{ scrap_form.scrap_description.label(class="form-control-label") }}
-                    {{ scrap_form.scrap_description(class="form-control") }}
-                </div>
-                <div class="wrapper">
-                    <div class="box drop-area">
-                        {% for item in items_data %}
-                            <div id="scrap{{ loop.index }}" class="scrap" draggable="true">
-                                {{ item }}
+                <div class="container">
+                    <div class="top-row">
+                        <div class="box drop-area">
+                            {% for item in items_data %}
+                                <div id="scrap{{ loop.index }}" class="scrap" draggable="true" data-item="{{ item }}">
+                                    {{ item }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    <div class="description-field" >Simply pick an item from<br> the left box, drop it in one of the boxes below<br> and add a description of your scraps</div>
+                    </div>
+                    <div class="bottom-row">
+                        {% set items_wanted_list = form.items_wanted_hidden.data.split(',') %}
+                        {% set items_for_trade_list = form.items_for_trade_hidden.data.split(',') %}
+                        <div class="items-wanted-container">
+                            <h3>Items Wanted</h3>
+                            <div class="items-wanted drop-area" id="items-wanted">
+                                {% for i in range(3) %}
+                                <div class="scrap-container" id="items-wanted-{{ i }}">
+                                    {% if i < items_wanted_list|length %}
+                                    <div class="scrap">
+                                        {{ items_wanted_list[i] }}
+                                        <button class="delete-scrap-btn"></button>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
                             </div>
-                        {% endfor %}
+                            <div class="item-wanted-description">
+                                <div class="form-group text-field">
+                                    {{ form.item_wanted_description.label(class="form-control-label") }}
+                                    {{ form.item_wanted_description(class="form-control custom-input-size") }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="items-for-trade-container">
+                            <h3>Items For Trade</h3>
+                            <div class="items-for-trade drop-area" id="items-for-trade">
+                                {% for i in range(3) %}
+                                <div class="scrap-container" id="items-for-trade-{{ i }}">
+                                    {% if i < items_for_trade_list|length %}
+                                    <div class="scrap">
+                                        {{ items_for_trade_list[i] }}
+                                        <button class="delete-scrap-btn"></button>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <div class="item-for-trade-description">
+                                <div class="form-group text-field">
+                                    {{ form.item_for_trade_description.label(class="form-control-label") }}
+                                    {{ form.item_for_trade_description(class="form-control custom-input-size") }}
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="description-field" >Simply pick an item from the left box<br> and drop in one of the boxes below</div>
-                <div class="items-wanted drop-area" id="items-wanted">
-                    <h3>Items Wanted</h3>
-                </div>
-                <div class="items-for-trade drop-area" id="items-for-trade">
-                    <h3>Items For Trade</h3>
-                </div>
-                <input type="submit" class="btn btn-primary" value="Update" onclick="event.preventDefault(); submitForm();">
+                <!-- set assigns value from hidden data to drop area divs
+                this safes the droped items even when returning to update_profile  -->
+
+                <input type="submit" class="btn btn-primary" value="Update" id="submit-btn">
+
                 <input type="button" class="btn btn-secondary" value="Cancel" onclick="window.location.href='{{ url_for('profile') }}'">
-                <input type="hidden" name="items_wanted_hidden" id="items_wanted_hidden" value="{{ form.items_wanted_hidden.data }}">
-                <input type="hidden" name="items_for_trade_hidden" id="items_for_trade_hidden" value="{{ form.items_for_trade_hidden.data }}">
+
+                <input type="hidden" id="items_wanted_hidden" name="items_wanted" value="{{ items_wanted_json }}">
+                <input type="hidden" id="items_for_trade_hidden" name="items_for_trade" value="{{ items_for_trade_json }}">
+
                 <input type="hidden" name="items_data" id="items_data" value="{{ items_data|tojson|safe }}">
                 </div>
+                <p>Items Wanted Hidden: {{ form.items_wanted_hidden.data }}</p>
+                <p>Items For Trade Hidden: {{ form.items_for_trade_hidden.data }}</p>
             </form>
         </div>
     </div>
 {% endblock %}
 {% block scripts %}
-    <script>
-        var allItems = {{ items_data|tojson }};
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            populateItems();
-            document.querySelector('#update-profile-form').addEventListener('submit', function(event) {
-                event.preventDefault();
-                submitForm();
-            });
-        });
-    </script>
-{% endblock %} 
+    <script src="{{ url_for('static', filename='dragdrop.js') }}"></script>
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+

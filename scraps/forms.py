@@ -38,8 +38,10 @@ class ProfileForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     profile_picture = FileField('Profile Picture', validators=[FileAllowed(['jpg', 'jpeg', 'png'])])
     about_me = TextAreaField('About Me', validators=[Length(min=0, max=500)])
-    items_for_trade_hidden = HiddenField(default=[])
-    items_wanted_hidden = HiddenField(default=[])
+    items_for_trade_hidden = HiddenField(default="")
+    items_wanted_hidden = HiddenField(default="")
+    item_for_trade_description = TextAreaField('Add details about your scraps', validators=[Length(min=0, max=500)])
+    item_wanted_description = TextAreaField('Tell others what you are looking for', validators=[Length(min=0, max=500)])
     submit = SubmitField('Update')
 
 class ScrapForm(FlaskForm):

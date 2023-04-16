@@ -12,13 +12,15 @@ from scraps.models import User, Scrap
 from flask_login import login_user, current_user, logout_user, login_required
 from json import JSONDecodeError
 
-# SAVE PICTURE FUNCTION
-def save_picture(form_picture, picture_path, output_size=(125, 125)):
+# Save Profile Picture Function
+def save_picture(form_picture, picture_path, output_size=(150, 150)):
+    print("save pic function started")
     random_hex = secrets.token_hex(8)
     _, f_ext = os.path.splitext(form_picture.filename)
     picture_fn = random_hex + f_ext
     picture_path = os.path.join(picture_path, picture_fn)
-
+    print("Picture filename:", picture_fn)
+    print("Picture path:", picture_path)
     img = Image.open(form_picture)
     img.thumbnail(output_size)
 
@@ -26,11 +28,36 @@ def save_picture(form_picture, picture_path, output_size=(125, 125)):
     if not os.path.exists(dir_path):
         os.makedirs(dir_path)
     print("Picture path:", picture_path)
-    
-    img.save(picture_path)
 
-    # return the filename so that it can be stored in the database
+    img.save(picture_path)
+    print("pic saved")
     return picture_fn
+
+@app.route("/save_scrap_details", methods=['POST'])
+@login_required
+def save_scrap_details(): 
+    scrap_id = request.form.get('scrap_id')
+    scrap_id = request.form.get('scrap_id')
+    description = request.form.get('description')
+    image = request.files.get('image')
+
+    if image:
+        scrap_picture_file = save_picture(image, current_app.config['SCRAP_PICS_FOLDER'], (300, 300))
+    else:
+        scrap_picture_file = None
+
+    scrap = Scrap.query.filter_by(user_id=current_user.id, scrap_id=scrap_id).first()
+    if scrap:
+        if scrap_picture_file:
+            scrap.picture = scrap_picture_file
+            scrap.description = description
+        else: new_scrap = Scrap(scrap_id= scrap_id, pictures=scrap_picture_file, description=description, user=current_user)
+        db.session.add(new_scrap)
+
+    db.session.commit()
+
+    return jsonify({"success": True})
+
 
 # JSON FUNCTION
 # Returns JSON object containing all user data
@@ -102,7 +129,7 @@ print("Update Login")
 def profile():
     form = ProfileForm()
     profile_picture = url_for('static', filename='profile_pics/' + current_user.profile_picture) if current_user.profile_picture else None
-
+    print("Profile Picture URL:", profile_picture)
     items_for_trade = json.loads(current_user.items_for_trade) if current_user.items_for_trade else []
     items_wanted = json.loads(current_user.items_wanted) if current_user.items_wanted else []
 
@@ -113,14 +140,13 @@ def profile():
     return render_template('profile.html', title='Profile', profile_picture=profile_picture, form=form, items_wanted=items_wanted, items_for_trade=items_for_trade, all_items=all_items)
 
 
-
-
 # UPDATE PROFILE
 @app.route("/update_profile", methods=['GET', 'POST'])
 @login_required
 def update_profile():
     form = ProfileForm()
     scrap_form = ScrapForm()
+    print("Checking form validation...")
     if form.validate_on_submit():
         address_updated = False
 
@@ -129,13 +155,12 @@ def update_profile():
                 form.city.data != current_user.city or
                 form.country.data != current_user.country):
             address_updated = True
-            print("Address fields:", form.street.data, form.postcode.data, form.city.data, form.country.data)
-            print("Current user address fields:", current_user.street, current_user.postcode, current_user.city, current_user.country)
-            print("Address updated:", address_updated)
 
         current_user.username = form.username.data
         current_user.email = form.email.data
         current_user.about_me = form.about_me.data
+        current_user.item_for_trade_description = form.item_for_trade_description.data
+        current_user.item_wanted_description = form.item_wanted_description.data
 
         if address_updated:
             current_user.street = form.street.data
@@ -150,14 +175,15 @@ def update_profile():
                     current_user.lat = lat
                     current_user.lng = lng
                 else:
+                    print("Form validation errors:", form.errors)
                     flash("Unable to get the coordinate for the given address. Please check the address and try again.", "danger")
                     return redirect(url_for("update_profile"))
         try:
-            items_wanted_data = form.items_wanted_hidden.data.split(',') if form.items_wanted_hidden.data else []
-            items_for_trade_data = form.items_for_trade_hidden.data.split(',') if form.items_for_trade_hidden.data else []
+            items_wanted_data = request.form.get("items_wanted_hidden", "").split(",")
+            items_for_trade_data = request.form.get("items_for_trade_hidden", "").split(",")
 
-            items_wanted_data = [item.strip() for item in items_wanted_data]
-            items_for_trade_data = [item.strip() for item in items_for_trade_data]
+            items_wanted_data = [item.strip() for item in items_wanted_data if item.strip() not in ['Add Details', 'Delete Scrap', 'Add Scrap']]
+            items_for_trade_data = [item.strip() for item in items_for_trade_data if item.strip() not in ['Add Details', 'Delete Scrap', 'Add Scrap']]
 
             current_user.items_wanted = json.dumps(items_wanted_data)
             current_user.items_for_trade = json.dumps(items_for_trade_data)
@@ -170,20 +196,27 @@ def update_profile():
             return redirect(url_for("update_profile"))
 
         if form.profile_picture.data:
+            print("Processing profile picture...")
             picture_file = save_picture(form.profile_picture.data, current_app.config['PROFILE_PICS_FOLDER'], (125, 125))
             current_user.profile_picture = picture_file
+            print("Profile picture updated:", current_user.profile_picture)
+
+        db.session.commit()
 
         if scrap_form.scrap_picture.data:
             scrap_picture_file = save_picture(scrap_form.scrap_picture.data, current_app.config['SCRAP_PICS_FOLDER'], (300, 300))
 
+            new_scrap = Scrap(picture=scrap_picture_file, description=scrap_form.scrap_description.data, user=current_user)
+            db.session.add(new_scrap)
+
             items_wanted_data = form.items_wanted_hidden.data.split(',') if form.items_wanted_hidden.data else []
             items_for_trade_data = form.items_for_trade_hidden.data.split(',') if form.items_for_trade_hidden.data else []
 
-            new_scrap = Scrap(picture=scrap_picture_file, description=scrap_form.scrap_description.data, items_for_trade=json.dumps(items_for_trade_data), items_wanted=json.dumps(items_wanted_data), user=current_user)
+            current_user.items_wanted = json.dumps(items_wanted_data)
+            current_user.items_for_trade = json.dumps(items_for_trade_data)
 
-            db.session.add(new_scrap)
             db.session.commit()
-            print("Scrap after saving:", scrap)
+            print("Scrap after saving:", new_scrap)
         flash('Your account has been updated!', 'success')
         return redirect(url_for('profile'))
 
@@ -195,34 +228,20 @@ def update_profile():
         form.postcode.data = current_user.postcode
         form.city.data = current_user.city
         form.country.data = current_user.country
-
-        scraps = Scrap.query.filter_by(user_id=current_user.id).all()
-        for scrap in scraps:
-            print(f"Scrap ID {scrap.id}")
+        form.item_for_trade_description.data = current_user.item_for_trade_description
+        form.item_wanted_description.data = current_user.item_wanted_description
         items_for_trade = json.loads(current_user.items_for_trade) if current_user.items_for_trade else []
         items_wanted = json.loads(current_user.items_wanted) if current_user.items_wanted else []
 
-
-        print(f"User {current_user.username}: items for trade - {items_for_trade}, items wanted - {items_wanted}")
-
-        #items_for_trade = []
-        #items_wanted = []
+        items_wanted_json = json.dumps(items_wanted)
+        items_for_trade_json = json.dumps(items_for_trade)
 
         form.items_wanted_hidden.data = ','.join(items_wanted)
         form.items_for_trade_hidden.data = ','.join(items_for_trade)
 
-    else:
-        print("Form errors:", form.errors)  # Add this line
-
-    items_data = {
-        "itemsWanted": items_wanted,
-        "itemsForTrade": items_for_trade
-    }
-    
-    all_items = ['Wood', 'Glass', 'Metal', 'Textiles', 'Plastics']
-    all_items_json = json.dumps(all_items)
-    return render_template('update_profile.html', title='Update Profile', form=form, scrap_form=scrap_form, items_data=all_items)
-
+        all_items = ['Wood', 'Glass', 'Metal', 'Textiles', 'Plastics']
+        all_items_json = json.dumps(all_items)
+        return render_template('update_profile.html', title='Update Profile', form=form, scrap_form=scrap_form, items_data=all_items, items_wanted_json=items_wanted_json, items_for_trade_json=items_for_trade_json)
 
 
 # GET USER DATA
@@ -230,19 +249,15 @@ def update_profile():
 def get_users():
     users = User.query.all()
     user_list = []
+
     for user in users:
-        scraps = Scrap.query.filter_by(user_id=user.id).all()
-        
-        items_for_trade = []
-        items_wanted = []
-        
-        for scrap in scraps:
-            if scrap.items_for_trade:
-                items_for_trade.extend(json.loads(scrap.items_for_trade))
-            if scrap.items_wanted:
-                items_wanted.extend(json.loads(scrap.items_wanted))
-            
-        user_data =({
+        # Access items_for_trade and items_wanted attributes from the User object
+        if user.items_for_trade:
+            items_for_trade = json.loads(user.items_for_trade)
+        if user.items_wanted:
+            items_wanted = json.loads(user.items_wanted)
+
+        user_data = ({
             'id': user.id,
             'username': user.username,
             'street': user.street,
@@ -292,89 +307,14 @@ GOOGLE_MAPS_API_KEY = os.getenv('GOOGLE_MAPS_API_KEY', 'GOOGLE_MAPS_API_KEY_WAS_
 
 @app.route('/map')
 def map():
-    return render_template('map.html', api_key=GOOGLE_MAPS_API_KEY)
+    # Check if the user is logged in
+    if current_user.is_authenticated:
+        # User is logged in, render the map template
+        return render_template('map.html', api_key=GOOGLE_MAPS_API_KEY)
+    else:
+        # User is not logged in, redirect to the registration page
+        return redirect(url_for('register'))
 
 
 if __name__ == '__main__':
     app.run(debug=True)
-    
-
-# UPDATE PROFILE
-""" @app.route("/update_profile", methods=['GET', 'POST'])
-@login_required
-def update_profile():
-    form = ProfileForm()
-    if form.validate_on_submit():
-        address_updated = False
-
-        if (form.street.data != current_user.street or
-                form.postcode.data != current_user.postcode or
-                form.city.data != current_user.city or
-                form.country.data != current_user.country):
-            address_updated = True
-
-        current_user.username = form.username.data
-        current_user.email = form.email.data
-        current_user.about_me = form.about_me.data
-
-        if address_updated:
-            current_user.street = form.street.data
-            current_user.postcode = form.postcode.data
-            current_user.city = form.city.data
-            current_user.country = form.country.data
-
-            address = f"{form.street.data}, {form.postcode.data}, {form.city.data}, {form.country.data}"
-            if address.strip() != ', , ,':  # Check if the address is not empty
-                lat, lng = get_lat_long(address, GOOGLE_MAPS_API_KEY)
-                if lat and lng:
-                    current_user.lat = lat
-                    current_user.lng = lng
-                else:
-                    flash("Unable to get the coordinate for the given address. Please check the address and try again.", "danger")
-                    return redirect(url_for("update_profile"))
-        try:
-            items_wanted_data = form.items_wanted_hidden.data.split(',') if form.items_wanted_hidden.data else []
-            items_for_trade_data = form.items_for_trade_hidden.data.split(',') if form.items_for_trade_hidden.data else []
-
-            items_wanted_data = [item.strip() for item in items_wanted_data]
-            items_for_trade_data = [item.strip() for item in items_for_trade_data]
-
-            current_user.items_wanted = json.dumps(items_wanted_data)
-            current_user.items_for_trade = json.dumps(items_for_trade_data)
-        except Exception as e:
-            print(f"Error processing items: {e}")
-            flash("There was an error processing your items. Please try again.", "danger")
-            return redirect(url_for("update_profile"))
-
-        if form.profile_picture.data:
-            picture_file = save_picture(form.profile_picture.data, current_app.config['PROFILE_PICS_FOLDER'], (125, 125))
-            current_user.profile_picture = picture_file
-        if form.scrap_picture.data:
-            scrap_picture_file = save_picture(form.scrap_picture.data, current_app.config['SCRAP_PICS_FOLDER'], (300, 300))
-            new_scrap = Scrap(picture=scrap_picture_file, description=form.scrap_description.data, items_for_trade=form.items_for_trade.data, items_wanted=form.items_wanted.data, user=current_user)
-        db.session.commit()
-        flash('Your account has been updated!', 'success')
-        return redirect(url_for('profile'))
-
-    elif request.method == 'GET':
-        form.username.data = current_user.username
-        form.email.data = current_user.email
-        form.about_me.data = current_user.about_me
-        form.items_for_trade.data = current_user.items_for_trade
-        form.items_wanted.data = current_user.items_wanted
-        form.street.data = current_user.street
-        form.postcode.data = current_user.postcode
-        form.city.data = current_user.city
-        form.country.data = current_user.country
-        form.items_wanted.data = json.loads(current_user.items_wanted) if current_user.items_wanted else []
-        form.items_for_trade.data = json.loads(current_user.items_for_trade) if current_user.items_for_trade else []
-    else:
-        print("Form errors:", form.errors)  # Add this line
-    items_data = {
-        "itemsWanted": form.items_wanted.data,
-        "itemsForTrade": form.items_for_trade.data
-    }
-    return render_template('update_profile.html', title='Update Profile', form=form, items_data=items_data) """
-
-
-

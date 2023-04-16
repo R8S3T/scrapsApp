@@ -21,23 +21,25 @@
     <div class="item-section">
       <div class="item-container">
         <h3>Items Wanted</h3>
-        <div class="items-for-trade">
-          <ul>
-            {% for item in items_wanted %}
-              <li>{{ item }}</li>
-            {% endfor %}
-          </ul>
+        <div class="items-wanted" id="items-wanted">
+          {% for item in items_wanted %}
+            <div class="scrap">{{ item }}</div>
+          {% endfor %}
         </div>
+        {% if current_user.item_wanted_description %}
+          <p>{{ current_user.item_wanted_description }}</p>
+        {% endif %}
       </div>
       <div class="item-container">
         <h3>Items for Trade</h3>
-        <div class="items-wanted">
-          <ul>
-            {% for item in items_for_trade %}
-              <li>{{ item }}</li>
-            {% endfor %}
-          </ul>
+        <div class="items-for-trade" id="items-for-trade">
+          {% for item in items_for_trade %}
+            <div class="scrap">{{ item }}</div>
+          {% endfor %}
         </div>
+        {% if current_user.item_for_trade_description %}
+          <p>{{ current_user.item_for_trade_description }}</p>
+        {% endif %}
       </div>
     </div>
   </div>

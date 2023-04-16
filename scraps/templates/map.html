@@ -2,15 +2,25 @@
 
 {% block title %}Page Title{% endblock %}
 
-
 {% block content %}
   <!-- Page content goes here -->
-  <div id="map"></div>
+  <div class="map-page">
+    <h2 class="map-heading">Find and Share Your DIY Leftovers Here </h2>
+    <div id="map"></div>
+    
+    <script src="{{ url_for('static', filename='map.js') }}" defer></script>
   
-  <script src="{{ url_for('static', filename='map.js') }}" defer></script>
+    <!-- Container for search inputs and button -->
+    <div class="search-container">
+      <!-- Input field for Google Places API search -->
+      <input type="text" id="search-input" placeholder="Search places">
+  
+      <!-- Input fields for user search-->
+      <input type="text" id="itemsForTradeSearch" placeholder="Search items for trade">
+      <input type="text" id="itemsWantedSearch" placeholder="Search wanted items">
+      <button onclick="searchItems()" class="search-btn">Search</button>
+    </div>
+  </div>
 
-  <!-- Input fields for user search-->
-  <input type="text" id="itemsForTradeSearch" placeholder="Search items for trade">
-  <input type="text" id="itemsWantedSearch" placeholder="Search wanted items">
-  <button onclick="searchItems()">Search</button>
 {% endblock %}
+

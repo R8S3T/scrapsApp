@@ -8,7 +8,7 @@
       <div class="user-section-left">
         {% if profile_picture %}
           <img src="{{ profile_picture }}" alt="Profile Picture" class="profile-picture">
-        {% endif %}
+      {% endif %}
         <h2>{{ current_user.username }}</h2>
         <p>{{ current_user.email }}</p>
         {% if current_user.address %}
@@ -30,6 +30,9 @@
             <div class="scrap">{{ item }}</div>
           {% endfor %}
         </div>
+        {% if current_user.item_wanted_description %}
+        <p><span style="font-size: 20px !important;">{{ current_user.item_wanted_description }}</span></p>
+        {% endif %}
       </div>
       <div class="item-container">
         <h3>Items for Trade</h3>
@@ -38,21 +41,25 @@
             <div class="scrap">{{ item }}</div>
           {% endfor %}
         </div>
+        {% if current_user.item_for_trade_description %}
+        <p><span style="font-size: 20px !important;">{{ current_user.item_for_trade_description }}</span></p>
+        {% endif %}
       </div>
       <input type="hidden" name="items_wanted_hidden" id="items_wanted_hidden" value="{{ items_wanted|join(',') }}">
       <input type="hidden" name="items_for_trade_hidden" id="items_for_trade_hidden" value="{{ items_for_trade|join(',') }}">
     </div>
-    <div class="bottom-right-buttons">
-      <a class="btn btn-primary" href="{{ url_for('update_profile') }}">Update Profile</a>
+    <div class="bottom-buttons">
+      <div class="left-button">
+        <a class="btn btn-primary btn-custom" href="{{ url_for('map') }}">Search and Trade</a>
+      </div>
+      <div class="right-button">
+        <a class="btn btn-primary btn-custom" href="{{ url_for('update_profile') }}">Update Profile</a>
+      </div>
     </div>
   </div>
 </div>
 {% endblock %}
 {% block scripts %}
-<script>
-  if (document.getElementById('items-data')) {
-      populateItems();
-  }
-</script>
+    <script src="{{ url_for('static', filename='dragdrop.js') }}"></script>
 {% endblock %}
 

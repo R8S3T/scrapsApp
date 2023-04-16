@@ -8,37 +8,41 @@ function addMarkersAndInfoWindows(userData) {
   markers.forEach(marker => marker.setMap(null));
   markers = [];
 
+  let currentInfoWindow = null;
+
   for (let i = 0; i < userData.length; i++) {
-    let user = userData[i];
-    let marker = new google.maps.Marker({
-      position: new google.maps.LatLng(user.lat, user.lng),
-      map: map,
-      title: user.username
-    });
+      let user = userData[i];
+      let marker = new google.maps.Marker({
+          position: new google.maps.LatLng(user.lat, user.lng),
+          map: map,
+          title: user.username
+      });
 
-    // Add the marker to markers array
-    markers.push(marker);
+      // Add the marker to markers array
+      markers.push(marker);
 
-    let infoWindowContent = `<div>
-      <h4>${user.username}</h4>
-      ${user.address ? `<p>${user.address}</p>` : ''}
-      <p>Items for Trade: ${user.items_for_trade.join(', ')}</p>
-      <p>Items wanted: ${user.items_wanted.join(', ')}</p>
-      <button onclick="window.location.href='/user/${encodeURIComponent(user.username)}'">View Profile</button>
+      let infoWindowContent = `<div>
+          <h4>${user.username}</h4>
+          ${user.address ? `<p>${user.address}</p>` : ''}
+          <p>Items for Trade: ${user.items_for_trade.join(', ')}</p>
+          <p>Items wanted: ${user.items_wanted.join(', ')}</p>
+          <button onclick="window.location.href='/user/${encodeURIComponent(user.username)}'">View Profile</button>
+      </div>`;
 
-    </div>`;
+      let infoWindow = new google.maps.InfoWindow({
+          content: infoWindowContent
+      });
 
-    let infoWindow = new google.maps.InfoWindow({
-      content: infoWindowContent
-    });
-
-    // Open infoWindow when marker is clicked
-    marker.addListener("click", () => {
-      infoWindow.open(map, marker);
-    })
+      // Open infoWindow when marker is clicked
+      marker.addListener("click", () => {
+          if (currentInfoWindow) {
+              currentInfoWindow.close();
+          }
+          infoWindow.open(map, marker);
+          currentInfoWindow = infoWindow;
+      });
   }
   console.log('Markers added:', markers);
-
 }
 
 function loadGoogleMapsAPI() {
@@ -89,7 +93,7 @@ function waitForMap() {
 function initMap() {
   return new Promise((resolve) => {
     let mapOptions = {
-      zoom: 11,
+      zoom: 12,
       minZoom: 2,
       center: {lat: 52.5200, lng: 13.4050}
   };
@@ -173,8 +177,6 @@ let allUsers = [];
 
 // Fetch all users when page loads
 window.onload = async function () {
-  await initMap();
-
   const response = await fetch("/api/users");
   allUsers = await response.json();
 
@@ -182,22 +184,7 @@ window.onload = async function () {
 
   // Fetch user data and call searchItems after the map is initialized
   fetchUserData();
-
 };
-
-
-/* function whenMapIsReady() {
-  return new Promise((resolve) => {
-    if (mapInitialized) {
-      resolve();
-    } else {
-      const listener = google.maps.event.addListenerOnce(map, "idle", () => {
-        google.maps.event.removeListener(listener);
-        resolve();
-      });
-    }
-  });
-} */
 
 let previousItemsForTradeSearch = '';
 let previousItemsWantedSearch = '';
@@ -213,9 +200,6 @@ async function searchItems() {
   previousItemsForTradeSearch = itemsForTradeSearch;
   previousItemsWantedSearch = itemsWantedSearch;
 
-  console.log("itemsForTradeSearch: ", itemsForTradeSearch);
-  console.log("itemsWantedSearch: ", itemsWantedSearch);
-
   const filteredUsers = allUsers.filter(user =>  {
     const itemsForTrade = user.items_for_trade.map(item => item.toLowerCase());
     const itemsWanted = user.items_wanted.map(item => item.toLowerCase());
@@ -225,10 +209,6 @@ async function searchItems() {
 
     return itemsForTradeMatch || itemsWantedMatch;
   });
-  console.log("Filtered users:", filteredUsers);
-
-
-  console.log('Filtered users:', filteredUsers);
 
   await waitForMap();
   addMarkersAndInfoWindows(filteredUsers);
@@ -250,13 +230,11 @@ async function searchItems() {
       }
     });
   }
-  
 }
 
 
 // Attach initMap to the window object
 window.initMap = initMap;
-
 
 document.addEventListener("DOMContentLoaded", async function() {
   try {

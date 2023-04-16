@@ -1,5 +1,5 @@
 import os
-from flask import Flask
+from flask import Flask, json
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
@@ -15,7 +15,6 @@ app.config['SECRET_KEY'] = '5791628bb0b13ce0c676dfde280ba245'
 app.config.from_pyfile('config.py')
 print("Profile pics folder:", app.config['PROFILE_PICS_FOLDER'])
 print("Scrap pics folder:", app.config['SCRAP_PICS_FOLDER'])
-
 
 # Initialize LoginManager
 bcrypt = Bcrypt(app)

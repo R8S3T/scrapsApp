@@ -13,9 +13,10 @@
         <p class="main-text d-none d-md-block">
           Welcome to Scraps, the marketplace for DIYers to share and trade their leftover materials from projects and workshops. Our platform connects you with like-minded individuals who value resourcefulness, creativity, and sustainability.
         </p>
-        <p class="main-text d-md-none">
-          Welcome to Scraps, the marketplace for DIYers to share and trade their leftover materials from projects and workshops. Our platform connects you with like-minded individuals who value resourcefulness, creativity, and sustainability.
-        </p>
+        <div class="go-to-map">
+          <h3>Start connecting with DIY lovers in your area here <a href="{{ url_for('map') }}" class="btn btn-primary btn-map">Go to Map</a></h3>
+        </div>
+      </div>
       </div>
       <div class="col-md-3 order-md-2">
         <img src="{{ url_for('static', filename='images/diy.jpg')}}" alt="Tools and scraps of wood on a wooden underground" class="img-start d-none d-md-block">
