@@ -26,8 +26,8 @@
             <div class="scrap">{{ item }}</div>
           {% endfor %}
         </div>
-        {% if current_user.item_wanted_description %}
-          <p>{{ current_user.item_wanted_description }}</p>
+        {% if user.item_wanted_description %}
+          <p>{{ user.item_wanted_description }}</p>
         {% endif %}
       </div>
       <div class="item-container">
@@ -37,8 +37,8 @@
             <div class="scrap">{{ item }}</div>
           {% endfor %}
         </div>
-        {% if current_user.item_for_trade_description %}
-          <p>{{ current_user.item_for_trade_description }}</p>
+        {% if user.item_for_trade_description %}
+          <p>{{ user.item_for_trade_description }}</p>
         {% endif %}
       </div>
     </div>

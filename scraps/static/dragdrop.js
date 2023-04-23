@@ -84,7 +84,6 @@ document.head.appendChild(style);
         console.log(itemsForTradeHidden.value, itemsWantedHidden.value);
     }
     
-    
 
     function getItemsFromDropArea(dropAreaId) {
         const dropArea = document.getElementById(dropAreaId);

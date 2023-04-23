@@ -200,14 +200,14 @@ async function searchItems() {
   previousItemsForTradeSearch = itemsForTradeSearch;
   previousItemsWantedSearch = itemsWantedSearch;
 
-  const filteredUsers = allUsers.filter(user =>  {
+  const filteredUsers = allUsers.filter(user => {
     const itemsForTrade = user.items_for_trade.map(item => item.toLowerCase());
     const itemsWanted = user.items_wanted.map(item => item.toLowerCase());
 
-    const itemsForTradeMatch = itemsForTrade.includes(itemsForTradeSearch);
-    const itemsWantedMatch = itemsWanted.includes(itemsWantedSearch);
+    const itemsForTradeMatch = itemsForTradeSearch ? itemsForTrade.includes(itemsForTradeSearch) : true;
+    const itemsWantedMatch = itemsWantedSearch ? itemsWanted.includes(itemsWantedSearch) : true;
 
-    return itemsForTradeMatch || itemsWantedMatch;
+    return itemsForTradeMatch && itemsWantedMatch;
   });
 
   await waitForMap();
@@ -231,6 +231,7 @@ async function searchItems() {
     });
   }
 }
+
 
 
 // Attach initMap to the window object
