@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-mysql_password = os.getenv('MYSQL_PASSWORD')
+DATABASE_URL = os.getenv('DATABASE_URL')
 
 
 app = Flask(__name__)
@@ -30,7 +30,7 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 # change app.config like this for mysql connection (change user, password)
-app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql://root:{mysql_password}@localhost/users'
+app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
 
 
 # unlike with sqlite3, sites.db is not visible in app folder under instance etc.
